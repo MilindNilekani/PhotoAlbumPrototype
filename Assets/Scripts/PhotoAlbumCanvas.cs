@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 
 //This acts as the UI + interactive layer for the Photo album. Communicates with the service
 public class PhotoAlbumCanvas : MonoBehaviour
@@ -33,79 +32,35 @@ public class PhotoAlbumCanvas : MonoBehaviour
     {
         var newPhoto = _photosAPIService.FetchNextPhoto();
         var newEntryToShow = Instantiate(_albumEntryPrefab, _contentPanel);
-        newEntryToShow.Initialize(newPhoto.id, newPhoto.title, newPhoto.url);
-        StartCoroutine(LoadImage(newEntryToShow, newPhoto.url));
+        newEntryToShow.Initialize(newPhoto.id, newPhoto.title, newPhoto.url, OnClickedAlbumEntry);
         _currentAlbumEntries.Add(newEntryToShow);
     }
 
     void DeleteCurrentlySelectedAlbumEntry()
     {
-        _currentAlbumEntries.Remove(_selectedAlbumEntry);
-        GameObject.Destroy(_selectedAlbumEntry);
-        _selectedAlbumEntry = null;
+        if(_selectedAlbumEntry != null)
+        {
+            _currentAlbumEntries.Remove(_selectedAlbumEntry);
+            GameObject.Destroy(_selectedAlbumEntry.gameObject);
+            DeselectAlbumEntry();
+        }
     }
 
     void OutputAllCurrentAlbumEntries()
     {
-
-    }
-
-    void CreateAlbumEntry(PhotoInfo photoInfo, int id)
-    {
-        PhotoAlbumEntry albumEntry = GameObject.Instantiate(_albumEntryPrefab, Vector3.zero, Quaternion.identity);
-        albumEntry.gameObject.SetActive(false);
-        albumEntry.Initialize(id, photoInfo.title, photoInfo.url);
-
-        albumEntry.StartCoroutine(LoadImage(albumEntry, photoInfo.url));
-        _currentAlbumEntries.Add(albumEntry);
-
-        Debug.Log($"Created AlbumEntry: ID = {id}, Title = {photoInfo.title}, URL = {photoInfo.url}");
-    }
-
-    IEnumerator LoadImage(PhotoAlbumEntry albumEntry, string url)
-    {
-        Debug.Log("Loading image: " + url);
-        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+        for(int i=0;i<_currentAlbumEntries.Count;i++)
         {
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
-                albumEntry.LoadImage(texture);
-            }
-            else
-            {
-                Debug.LogError("Failed to load image: " + request.error);
-            }
+            _currentAlbumEntries[i].LogAlbumData();
         }
     }
 
-    //Deals with clicking and unclicking album entries
-    void Update()
+    void OnClickedAlbumEntry(PhotoAlbumEntry photoAlbumEntry)
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                PhotoAlbumEntry hitEntry = hit.collider.GetComponent<PhotoAlbumEntry>();
-                if (hitEntry != null)
-                {
-                    if (_selectedAlbumEntry != null)
-                    {
-                        DeselectAlbumEntry(_selectedAlbumEntry);
-                    }
-
-                    SelectAlbumEntry(hitEntry);
-                }
-            }
-        }
+        DeselectAlbumEntry();
+        SelectAlbumEntry(photoAlbumEntry);
     }
 
-    void DeselectAlbumEntry(PhotoAlbumEntry albumEntry)
+    void DeselectAlbumEntry()
     {
         _selectedAlbumEntry = null;
         _preview.gameObject.SetActive(false);
