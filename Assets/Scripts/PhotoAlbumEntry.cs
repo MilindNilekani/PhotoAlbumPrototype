@@ -1,28 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PhotoAlbumEntry : MonoBehaviour
 {
-    public int id;
-    public string title;
-    public string url;
-    public Texture2D texture;
+    [SerializeField] private RawImage _rawImage;
+    private int _id;
+    private string _title;
+    private string _url;
+    private Texture2D _texture;
 
     public void Initialize(int id, string title, string url)
     {
-        this.id = id;
-        this.title = title;
-        this.url = url;
+        _id = id;
+        _title = title;
+        _url = url;
     }
 
     public void LoadImage(Texture2D texture)
     {
-        this.texture = texture;
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null && texture != null)
+        _texture = texture;
+        if (_rawImage != null && texture != null)
         {
-            renderer.material.mainTexture = texture;
+            _rawImage.texture = texture;
         }
+    }
+
+    public void LogAlbumData()
+    {
+        Debug.Log($"Selected AlbumEntry title: {_title} (ID: {_id}) Image URL: {_url}");
     }
 }

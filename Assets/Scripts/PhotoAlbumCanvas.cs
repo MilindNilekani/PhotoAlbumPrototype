@@ -26,7 +26,7 @@ public class PhotoAlbumCanvas : MonoBehaviour
 
     void CreateNewAlbumEntry()
     {
-
+        var newEntryToShow = _photosAPIService.FetchNextAlbumEntry();
     }
 
     void DeleteCurrentlySelectedAlbumEntry()
@@ -71,9 +71,5 @@ public class PhotoAlbumCanvas : MonoBehaviour
     void SelectAlbumEntry(PhotoAlbumEntry albumEntry)
     {
         _selectedAlbumEntry = albumEntry;
-        Debug.Log($"Selected AlbumEntry: {albumEntry.title} (ID: {albumEntry.id})");
-
-        // Display the image URL in the console
-        Debug.Log($"Image URL: {albumEntry.url}");
     }
 }

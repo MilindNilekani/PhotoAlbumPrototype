@@ -8,7 +8,7 @@ public class PhotosAPIService
 {
     private PhotoAlbumEntry _albumEntryPrefab;
     private List<PhotoAlbumEntry> _allAlbumEntries = new List<PhotoAlbumEntry>();
-    private int _currentAlbumEntryIndexFetched;
+    private int _currentAlbumEntryIndexFetched = 0;
     private const string _apiUrl = "https://jsonplaceholder.typicode.com/photos";
 
     public PhotosAPIService(PhotoAlbumEntry prefab)
@@ -67,5 +67,12 @@ public class PhotosAPIService
                 Debug.LogError("Failed to load image: " + request.error);
             }
         }
+    }
+
+    public PhotoAlbumEntry FetchNextAlbumEntry()
+    {
+        var entry = _allAlbumEntries[_currentAlbumEntryIndexFetched];
+        _currentAlbumEntryIndexFetched++;
+        return entry;
     }
 }
