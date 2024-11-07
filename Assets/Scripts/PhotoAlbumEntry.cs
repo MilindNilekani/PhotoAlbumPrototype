@@ -10,6 +10,7 @@ public class PhotoAlbumEntry : MonoBehaviour
     private string _title;
     private string _url;
     private Texture2D _texture;
+    public Texture2D Texture=> _texture;
 
     public void Initialize(int id, string title, string url)
     {
